@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Celebration &amp; Event Planner</title>
+  <meta name="description" content="Plan weddings, birthdays and community events: budget split, timeline, vendor checklist and personalised ideas.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='theme.js') }}?v=4.0"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=4.0">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="hero">
+    <div class="container hero-inner">
+      <div class="hero-top">
+        <p class="eyebrow"><span class="badge-dot" aria-hidden="true"></span> Challenge 5 &bull; AI Event Architect</p>
+        <button type="button" id="theme-btn" class="icon-btn" aria-pressed="false" aria-label="Toggle dark theme" title="Toggle dark theme">
+          <span id="theme-icon" aria-hidden="true">&#9790;</span>
+        </button>
+      </div>
+      <h1>Celebration &amp; Event Planner</h1>
+      <p class="tagline">Plan unforgettable weddings, birthdays and community celebrations with exact budget splits, dated milestones, vendor checklists and AI-crafted inspiration.</p>
+      <ul class="hero-points">
+        <li><span aria-hidden="true">&#128176;</span> Exact Budget Math</li>
+        <li><span aria-hidden="true">&#128197;</span> Dated Timeline</li>
+        <li><span aria-hidden="true">&#9989;</span> Interactive Vendors</li>
+        <li><span aria-hidden="true">&#10024;</span> AI Theme &amp; Ideas</li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main" class="container layout" tabindex="-1">
+    <section aria-labelledby="form-heading" class="card form-card">
+      <div class="form-header-row">
+        <h2 id="form-heading">Tell us about your event</h2>
+        <div class="preset-bar" aria-label="Quick sample events">
+          <span class="preset-label">Quick sample:</span>
+          <button type="button" class="preset-chip" data-preset="wedding" title="Load sample royal wedding">
+            <span aria-hidden="true">&#128141;</span> Wedding
+          </button>
+          <button type="button" class="preset-chip" data-preset="birthday" title="Load sample birthday party">
+            <span aria-hidden="true">&#127874;</span> Birthday
+          </button>
+          <button type="button" class="preset-chip" data-preset="community" title="Load sample community event">
+            <span aria-hidden="true">&#127969;</span> Community
+          </button>
+        </div>
+      </div>
+
+      <div id="error-summary" class="error-summary" role="alert" tabindex="-1" hidden>
+        <h3 id="error-summary-title">Please fix the following</h3>
+        <ul id="error-list"></ul>
+      </div>
+
+      <form id="plan-form" novalidate>
+        <fieldset class="field type-field">
+          <legend>What are you celebrating?</legend>
+          <div class="type-grid">
+            <label class="type-card">
+              <input type="radio" name="event_type" id="event_type" value="wedding" data-placeholder="Aarav and Diya's wedding" data-prefs="Vegetarian menu, outdoor mandap, traditional theme" checked>
+              <span class="type-body">
+                <span class="type-icon" aria-hidden="true">&#128141;</span>
+                <span class="type-name">Wedding</span>
+                <span class="type-sub">Many vendors</span>
+              </span>
+            </label>
+            <label class="type-card">
+              <input type="radio" name="event_type" id="event_type_birthday" value="birthday" data-placeholder="Riya's 10th birthday" data-prefs="Jungle theme, vegetarian snacks, games for kids">
+              <span class="type-body">
+                <span class="type-icon" aria-hidden="true">&#127874;</span>
+                <span class="type-name">Birthday</span>
+                <span class="type-sub">Fun and personal</span>
+              </span>
+            </label>
+            <label class="type-card">
+              <input type="radio" name="event_type" id="event_type_community" value="community" data-placeholder="Ganesh Utsav 2026" data-prefs="Open-air venue, cultural programme, step-free access">
+              <span class="type-body">
+                <span class="type-icon" aria-hidden="true">&#127969;</span>
+                <span class="type-name">Community event</span>
+                <span class="type-sub">Crowds and permits</span>
+              </span>
+            </label>
+          </div>
+          <p class="error" id="event_type-error" hidden></p>
+        </fieldset>
+
+        <div class="field">
+          <label for="title">Event name</label>
+          <input type="text" id="title" name="title" maxlength="80" required aria-required="true"
+                 aria-describedby="title-hint title-error" autocomplete="off" placeholder="Aarav and Diya's wedding">
+          <p class="hint" id="title-hint">Up to 80 characters.</p>
+          <p class="error" id="title-error" hidden></p>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="guest_count">Number of guests</label>
+            <input type="number" id="guest_count" name="guest_count" min="1" max="2000" inputmode="numeric" required
+                   aria-required="true" aria-describedby="guest_count-hint guest_count-error">
+            <p class="hint" id="guest_count-hint">Between 1 and 2000.</p>
+            <p class="error" id="guest_count-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="budget">Total budget (INR)</label>
+            <input type="number" id="budget" name="budget" min="1000" max="100000000" step="1" inputmode="numeric"
+                   required aria-required="true" aria-describedby="budget-hint budget-error">
+            <p class="hint" id="budget-hint">Whole rupees, minimum 1,000.</p>
+            <p class="error" id="budget-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="event_date">Event date</label>
+            <input type="date" id="event_date" name="event_date" required aria-required="true"
+                   aria-describedby="event_date-hint event_date-error">
+            <p class="hint" id="event_date-hint">Today or a later date.</p>
+            <p class="error" id="event_date-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" maxlength="60" required aria-required="true"
+                   aria-describedby="city-error" autocomplete="address-level2" placeholder="Bengaluru">
+            <p class="error" id="city-error" hidden></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="preferences">Preferences (optional)</label>
+          <textarea id="preferences" name="preferences" rows="4" maxlength="500"
+                    aria-describedby="preferences-hint preferences-error"
+                    placeholder="Vegetarian menu, outdoor mandap, traditional theme"></textarea>
+          <p class="hint" id="preferences-hint">Diet, theme, culture, accessibility needs. Up to 500 characters.</p>
+          <p class="error" id="preferences-error" hidden></p>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn"><span class="btn-label">Create my plan</span></button>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="results" class="card results-card" aria-labelledby="results-heading" tabindex="-1" hidden>
+      <div class="results-head">
+        <div>
+          <h2 id="results-heading">Your plan</h2>
+          <p id="results-sub" class="results-sub"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="print-btn">Print or save as PDF</button>
+          <button type="button" class="btn secondary" id="ics-btn">Add timeline to calendar</button>
+        </div>
+      </div>
+      <p id="ai-note" class="chip"></p>
+      <div id="warnings" class="warnings" role="region" aria-label="Planning notes" hidden></div>
+
+      <nav class="jump" aria-label="Plan sections">
+        <a href="#sec-overview">Overview</a>
+        <a href="#sec-budget">Budget</a>
+        <a href="#sec-timeline">Timeline</a>
+        <a href="#sec-vendors">Vendors</a>
+        <a href="#sec-ideas">Ideas</a>
+      </nav>
+
+      <section id="sec-overview" class="sec" aria-labelledby="overview-heading">
+        <h3 id="overview-heading">Overview</h3>
+        <p id="summary" class="summary"></p>
+        <dl id="overview" class="overview"></dl>
+      </section>
+
+      <section id="sec-budget" class="sec" aria-labelledby="budget-heading">
+        <h3 id="budget-heading">Budget split</h3>
+        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="budget-heading">
+          <table id="budget-table">
+            <caption class="sr-only">Budget allocation by category</caption>
+            <thead><tr><th scope="col">Category</th><th scope="col" class="num">Share</th><th scope="col" class="num">Amount</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="sec-timeline" class="sec" aria-labelledby="timeline-heading">
+        <h3 id="timeline-heading">Timeline</h3>
+        <ol id="timeline" class="timeline"></ol>
+      </section>
+
+      <section id="sec-vendors" class="sec" aria-labelledby="vendors-heading">
+        <h3 id="vendors-heading">Vendor checklist</h3>
+        <progress id="checklist-bar" max="1" value="0" aria-label="Checklist progress"></progress>
+        <p id="checklist-progress" class="hint" role="status" aria-live="polite"></p>
+        <div id="vendors" class="vendor-grid"></div>
+      </section>
+
+      <section id="sec-ideas" class="sec" aria-labelledby="ideas-heading">
+        <h3 id="ideas-heading">Personalised ideas</h3>
+        <ul id="ideas" class="idea-grid"></ul>
+        <h3 id="tips-heading">Ways to save</h3>
+        <ul id="tips" class="tips"></ul>
+      </section>
+    </section>
+  </main>
+
+  <footer class="container site-footer">
+    <p>Budget and dates are calculated by the app. AI suggestions are a starting point, so always confirm details with your vendors.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}?v=4.0" defer></script>
+</body>
+</html>
