@@ -154,6 +154,17 @@ flask --app app run --debug
 
 Open http://127.0.0.1:5000.
 
+## Deploy to Vercel
+
+The repository includes ready-to-use Vercel serverless configurations (`wsgi.py`, `index.py`, `vercel.json`, and `pyproject.toml`):
+
+1. Import your GitHub repository into [Vercel](https://vercel.com).
+2. Set Environment Variables in Vercel project settings:
+   - `GEMINI_API_KEY`: Your Gemini API key from Google AI Studio.
+   - `APP_TIMEZONE`: `Asia/Kolkata`
+   - `TRUST_PROXY`: `1`
+3. Click **Deploy**. Vercel will automatically detect `wsgi.py` and deploy the Flask serverless function.
+
 ## Deploy to Google Cloud Run
 
 ```bash
