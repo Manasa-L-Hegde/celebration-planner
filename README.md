@@ -154,16 +154,27 @@ flask --app app run --debug
 
 Open http://127.0.0.1:5000.
 
+## Deploy with Docker on Render
+
+1. On [render.com](https://render.com), click **New +** &rarr; **Web Service**.
+2. Connect your repository: `https://github.com/Manasa-L-Hegde/celebration-planner`.
+3. Set **Runtime** to **Docker** (Render automatically finds `Dockerfile`).
+4. Select the **Free** instance type.
+5. In **Environment Variables**, add:
+   - `GEMINI_API_KEY`: *(your Gemini key from Google AI Studio)*
+   - `GEMINI_MODEL`: `gemini-3.5-flash`
+6. Click **Create Web Service**. Render builds the image and launches the service.
+
 ## Deploy to Vercel
 
-The repository includes ready-to-use Vercel serverless configurations (`wsgi.py`, `index.py`, `vercel.json`, and `pyproject.toml`):
+The repository includes ready-to-use Vercel configurations (`main.py`, `wsgi.py`, `index.py`, `api/index.py`, and `pyproject.toml`):
 
 1. Import your GitHub repository into [Vercel](https://vercel.com).
 2. Set Environment Variables in Vercel project settings:
    - `GEMINI_API_KEY`: Your Gemini API key from Google AI Studio.
    - `APP_TIMEZONE`: `Asia/Kolkata`
    - `TRUST_PROXY`: `1`
-3. Click **Deploy**. Vercel will automatically detect `wsgi.py` and deploy the Flask serverless function.
+3. Click **Deploy**. Vercel will automatically detect `main:app` and deploy the Flask serverless function.
 
 ## Deploy to Google Cloud Run
 
