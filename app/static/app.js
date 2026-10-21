@@ -108,21 +108,21 @@
   const PRESETS = {
     wedding: {
       type: "wedding",
-      title: "Aarav and Diya's Royal Wedding",
+      title: "Aarav and Diya’s Wedding",
       guest_count: 250,
-      budget: 1500000,
-      days: 60,
+      budget: 1200000,
+      date: "2027-03-21",
       city: "Bengaluru",
-      preferences: "Royal vegetarian feast, outdoor mandap, marigold & jasmine floral styling, live Carnatic music",
+      preferences: "Vegetarian menu, outdoor garden venue, traditional South Indian theme, seating for elderly guests",
     },
     birthday: {
       type: "birthday",
-      title: "Riya's 10th Safari Birthday Adventure",
-      guest_count: 45,
-      budget: 65000,
-      days: 20,
-      city: "Mumbai",
-      preferences: "Jungle theme cake, interactive party games, magician, kids snack boxes",
+      title: "Manasa’s 7th Birthday",
+      guest_count: 30,
+      budget: 12000,
+      date: "2026-10-30",
+      city: "Bengaluru",
+      preferences: "Vegetarian snacks, jungle theme",
     },
     community: {
       type: "community",
@@ -130,7 +130,7 @@
       guest_count: 500,
       budget: 450000,
       days: 45,
-      city: "Pune",
+      city: "Bengaluru",
       preferences: "Open amphitheatre, community rangoli competition, cultural drama, step-free access",
     },
   };
@@ -147,7 +147,7 @@
       document.getElementById("title").value = preset.title;
       document.getElementById("guest_count").value = preset.guest_count;
       document.getElementById("budget").value = preset.budget;
-      document.getElementById("event_date").value = futureDateIso(preset.days);
+      document.getElementById("event_date").value = preset.date || futureDateIso(preset.days || 30);
       document.getElementById("city").value = preset.city;
       document.getElementById("preferences").value = preset.preferences;
       clearErrors();
@@ -289,9 +289,9 @@
     const pct = boxes.length ? Math.round((done / boxes.length) * 100) : 0;
     const prog = document.getElementById("checklist-progress");
     if (done === boxes.length && boxes.length > 0) {
-      prog.textContent = `All ${boxes.length} vendor tasks completed! (100%) - You're celebration ready! 🎉`;
+      prog.textContent = `All ${boxes.length} checklist items done! (100%) - You're celebration ready! 🎉`;
     } else {
-      prog.textContent = `${done} of ${boxes.length} tasks completed (${pct}%)`;
+      prog.textContent = `${done} of ${boxes.length} checklist items done (${pct}%)`;
     }
   }
 

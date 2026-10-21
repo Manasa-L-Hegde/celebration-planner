@@ -21,8 +21,8 @@ class Settings:
     """Immutable application settings."""
 
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.5-flash"
-    gemini_timeout_ms: int = 20_000
+    gemini_model: str = "gemini-3.8-flash"
+    gemini_timeout_ms: int = 45_000
     rate_limit_per_minute: int = 10
     cache_size: int = 128
     max_request_bytes: int = 16 * 1024
@@ -41,8 +41,8 @@ def load_settings() -> Settings:
 
     return Settings(
         gemini_api_key=os.getenv("GEMINI_API_KEY", "").strip(),
-        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash").strip(),
-        gemini_timeout_ms=_int_env("GEMINI_TIMEOUT_MS", 20_000, 1_000),
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip() or "gemini-3.8-flash",
+        gemini_timeout_ms=_int_env("GEMINI_TIMEOUT_MS", 45_000, 1_000),
         rate_limit_per_minute=_int_env("RATE_LIMIT_PER_MINUTE", 10),
         cache_size=_int_env("CACHE_SIZE", 128),
         max_request_bytes=_int_env("MAX_REQUEST_BYTES", 16 * 1024, 1_024),
