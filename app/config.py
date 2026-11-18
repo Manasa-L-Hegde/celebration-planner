@@ -21,13 +21,16 @@ class Settings:
     """Immutable application settings."""
 
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.8-flash"
-    gemini_timeout_ms: int = 45_000
+    gemini_model: str = "gemini-3.5-flash-lite"
+    gemini_backup_model: str = "gemini-2.5-flash"
+    gemini_timeout_ms: int = 40_000
+    gemini_max_retries: int = 1
     rate_limit_per_minute: int = 10
     cache_size: int = 128
     max_request_bytes: int = 16 * 1024
     timezone: str = "Asia/Kolkata"
     trust_proxy: bool = False
+    keep_alive_url: str = "https://celebration-planner.onrender.com/healthz"
 
 
 def load_settings() -> Settings:
@@ -41,11 +44,14 @@ def load_settings() -> Settings:
 
     return Settings(
         gemini_api_key=os.getenv("GEMINI_API_KEY", "").strip(),
-        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip() or "gemini-3.8-flash",
-        gemini_timeout_ms=_int_env("GEMINI_TIMEOUT_MS", 45_000, 1_000),
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip() or "gemini-3.5-flash-lite",
+        gemini_backup_model=os.getenv("GEMINI_BACKUP_MODEL", "gemini-2.5-flash").strip() or "gemini-2.5-flash",
+        gemini_timeout_ms=_int_env("GEMINI_TIMEOUT_MS", 40_000, 1_000),
+        gemini_max_retries=_int_env("GEMINI_MAX_RETRIES", 1, 0),
         rate_limit_per_minute=_int_env("RATE_LIMIT_PER_MINUTE", 10),
         cache_size=_int_env("CACHE_SIZE", 128),
         max_request_bytes=_int_env("MAX_REQUEST_BYTES", 16 * 1024, 1_024),
         timezone=os.getenv("APP_TIMEZONE", "Asia/Kolkata").strip(),
         trust_proxy=os.getenv("TRUST_PROXY", "0") == "1",
+        keep_alive_url=os.getenv("KEEP_ALIVE_URL", "https://celebration-planner.onrender.com/healthz").strip(),
     )

@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/PromptWars-Challenge%205%20Winner%20Ready-E34234?style=for-the-badge&logo=target" alt="Challenge 5">
-  <img src="https://img.shields.io/badge/Tests-75%20Passed-0B6E4F?style=for-the-badge&logo=pytest" alt="75 Tests Passed">
+  <img src="https://img.shields.io/badge/Tests-77%20Passed-0B6E4F?style=for-the-badge&logo=pytest" alt="77 Tests Passed">
   <img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.11+">
   <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Ready">
   <img src="https://img.shields.io/badge/License-MIT-FAF5EB?style=for-the-badge" alt="MIT License">
@@ -189,7 +189,9 @@ cp .env.example .env
 *(Optional)* Add your Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) into `.env`:
 ```ini
 GEMINI_API_KEY=your_actual_key_here
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_BACKUP_MODEL=gemini-2.5-flash
+GEMINI_TIMEOUT_MS=40000
 APP_TIMEZONE=Asia/Kolkata
 ```
 > **Note:** The application is 100% functional even without an API key by falling back to curated expert rules!
@@ -204,7 +206,7 @@ Open your browser to: **`http://127.0.0.1:5000`**
 
 ## 🧪 Automated Testing Suite
 
-The repository includes a comprehensive 75-test test suite executed via `pytest`:
+The repository includes a comprehensive 77-test test suite executed via `pytest`:
 
 ```bash
 pytest
@@ -212,18 +214,19 @@ pytest
 
 ```text
 ============================== test session starts ==============================
-collected 75 items
+collected 77 items
 
-tests/test_ai.py .............                                             [ 17%]
-tests/test_api.py .........................                                [ 50%]
+tests/test_ai.py ...............                                           [ 19%]
+tests/test_api.py .........................                                [ 51%]
 tests/test_planner.py ....................                                 [ 77%]
 tests/test_security.py ...........                                         [ 92%]
 tests/test_services.py ......                                              [100%]
 
-============================== 75 passed in 0.54s ===============================
+============================== 77 passed in 0.58s ===============================
 ```
 
 ### Test Coverage Highlights:
+- **Resilience & Fallbacks**: Automatic retry on transient API failure, multi-model backup cascade, graceful offline degradation, and error tracing.
 - **Budget Math**: Edge cases where amounts equal minimum/maximum thresholds; verification that sum of category rupee amounts equals 100.0% of the budget.
 - **Security & Injection**: Rejection of prompt injection phrases, instruction overrides, HTML tags, and excessive payloads.
 - **Rate Limiting**: Accurate sliding-window token bucket enforcement with HTTP 429 and `Retry-After` headers.
@@ -241,7 +244,10 @@ Live at: **`https://celebration-planner.onrender.com/`**
 4. Select the **Free** instance plan.
 5. In **Environment Variables**, add:
    - `GEMINI_API_KEY`: *(your Gemini key from Google AI Studio)*
-   - `GEMINI_MODEL`: `gemini-3.5-flash`
+   - `GEMINI_MODEL`: `gemini-3.5-flash-lite`
+   - `GEMINI_BACKUP_MODEL`: `gemini-2.5-flash`
+   - `GEMINI_TIMEOUT_MS`: `40000`
+   - `ENABLE_KEEP_ALIVE`: `1`
 6. Click **Create Web Service**.
 
 ### Option 2: Vercel Serverless

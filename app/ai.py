@@ -82,25 +82,37 @@ def sanitize_insights(raw: AIInsights) -> AIInsights:
 class GeminiProvider:
     """Calls Gemini and requests JSON constrained to :class:`AIInsights`."""
 
-    def __init__(self, api_key: str, model: str, system_prompt: str, timeout_ms: int = 20_000) -> None:
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        system_prompt: str,
+        timeout_ms: int = 40_000,
+        backup_model: Optional[str] = None,
+        max_retries: int = 1,
+    ) -> None:
         self._api_key = api_key
         self._model = model
+        self._backup_model = backup_model
         self._system_prompt = system_prompt
         self._timeout_ms = timeout_ms
+        self._max_retries = max_retries
         self._client = None
+        self._active_model = model
 
-    def _call_model(self, prompt: str) -> str:
+    def _call_model(self, prompt: str, model: Optional[str] = None) -> str:
         """Send the prompt to Gemini and return the raw JSON text."""
         from google import genai
         from google.genai import types
 
+        target_model = model or getattr(self, "_active_model", None) or self._model
         if self._client is None:
             self._client = genai.Client(
                 api_key=self._api_key,
                 http_options=types.HttpOptions(timeout=self._timeout_ms),
             )
         response = self._client.models.generate_content(
-            model=self._model,
+            model=target_model,
             contents=prompt,
             config=types.GenerateContentConfig(
                 system_instruction=self._system_prompt,
@@ -113,8 +125,38 @@ class GeminiProvider:
         return response.text or ""
 
     def generate(self, request: PlanRequest, core: CorePlan) -> AIInsights:
-        raw_text = self._call_model(build_user_prompt(request, core))
-        return sanitize_insights(AIInsights.model_validate_json(raw_text))
+        prompt = build_user_prompt(request, core)
+        models_to_try: list[str] = [self._model]
+        if self._backup_model and self._backup_model not in models_to_try:
+            models_to_try.append(self._backup_model)
+        for candidate in ("gemini-3.5-flash-lite", "gemini-2.5-flash", "gemini-3.8-flash"):
+            if candidate not in models_to_try:
+                models_to_try.append(candidate)
+
+        last_error: Optional[Exception] = None
+        for model_name in models_to_try:
+            self._active_model = model_name
+            for attempt in range(self._max_retries + 1):
+                try:
+                    try:
+                        raw_text = self._call_model(prompt, model=model_name)
+                    except TypeError:
+                        # Compatibility with custom subclasses overriding _call_model(prompt)
+                        raw_text = self._call_model(prompt)
+                    return sanitize_insights(AIInsights.model_validate_json(raw_text))
+                except Exception as exc:  # noqa: BLE001
+                    last_error = exc
+                    logger.warning(
+                        "Gemini call failed (model=%s, attempt=%d/%d, error=%s: %s).",
+                        model_name,
+                        attempt + 1,
+                        self._max_retries + 1,
+                        type(exc).__name__,
+                        exc,
+                    )
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError("No Gemini response received.")
 
 
 _FALLBACK_IDEAS = {
@@ -199,7 +241,12 @@ class InsightsService:
         try:
             insights = self._provider.generate(request, core)
         except Exception as exc:  # noqa: BLE001 - any provider failure degrades gracefully
-            logger.warning("AI provider failed (%s); using fallback.", type(exc).__name__)
+            logger.error(
+                "AI provider failed (%s: %s); using fallback.",
+                type(exc).__name__,
+                exc,
+                exc_info=True,
+            )
             return self._fallback.generate(request, core), "fallback"
 
         with self._lock:

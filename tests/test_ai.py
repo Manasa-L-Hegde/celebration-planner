@@ -105,3 +105,61 @@ def test_invalid_model_json_triggers_fallback():
     request, core = _core()
     insights, source = InsightsService(StubGemini("not json")).get(request, core)
     assert source == "fallback"
+
+
+class FailingOnceGemini(GeminiProvider):
+    def __init__(self, text):
+        super().__init__("key", "primary-model", "system", max_retries=1)
+        self._text = text
+        self.attempts = 0
+
+    def _call_model(self, prompt, model=None):
+        self.attempts += 1
+        if self.attempts == 1:
+            raise RuntimeError("Transient network glitch")
+        return self._text
+
+
+def test_gemini_provider_retries_on_failure():
+    payload = AIInsights(
+        summary="retried ok", ideas=[Idea(title="t", description="d")],
+        checklist_extras=[], saving_tips=["s"],
+    ).model_dump_json()
+    request, core = _core()
+    provider = FailingOnceGemini(payload)
+    insights = provider.generate(request, core)
+    assert insights.summary == "retried ok"
+    assert provider.attempts == 2
+
+
+class ModelTrackingGemini(GeminiProvider):
+    def __init__(self, text):
+        super().__init__(
+            "key",
+            model="primary-bad",
+            system_prompt="system",
+            backup_model="backup-good",
+            max_retries=0,
+        )
+        self._text = text
+        self.models_called = []
+
+    def _call_model(self, prompt, model=None):
+        target = model or self._active_model
+        self.models_called.append(target)
+        if target == "primary-bad":
+            raise RuntimeError("Primary model 404")
+        return self._text
+
+
+def test_gemini_provider_switches_to_backup_model():
+    payload = AIInsights(
+        summary="backup ok", ideas=[Idea(title="t", description="d")],
+        checklist_extras=[], saving_tips=["s"],
+    ).model_dump_json()
+    request, core = _core()
+    provider = ModelTrackingGemini(payload)
+    insights = provider.generate(request, core)
+    assert insights.summary == "backup ok"
+    assert "primary-bad" in provider.models_called
+    assert "backup-good" in provider.models_called

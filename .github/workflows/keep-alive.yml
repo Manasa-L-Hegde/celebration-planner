@@ -1,0 +1,15 @@
+name: Keep-Alive Ping
+
+on:
+  schedule:
+    # Run every 10 minutes to prevent Render free-tier container from sleeping
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Live Site
+        run: |
+          curl -s -f -m 30 "https://celebration-planner.onrender.com/healthz" || echo "Ping non-200 or timeout"

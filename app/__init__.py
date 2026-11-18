@@ -35,13 +35,26 @@ def create_app(
     tz = ZoneInfo(settings.timezone)
     if provider is None and settings.gemini_api_key:
         provider = GeminiProvider(
-            settings.gemini_api_key, settings.gemini_model, load_system_prompt(), settings.gemini_timeout_ms
+            settings.gemini_api_key,
+            settings.gemini_model,
+            load_system_prompt(),
+            settings.gemini_timeout_ms,
+            backup_model=settings.gemini_backup_model,
+            max_retries=settings.gemini_max_retries,
         )
 
     app.extensions["settings"] = settings
     app.extensions["today_fn"] = today_fn or (lambda: datetime.now(tz).date())
     app.extensions["rate_limiter"] = RateLimiter(settings.rate_limit_per_minute, 60.0)
     app.extensions["insights"] = InsightsService(provider, settings.cache_size)
+
+    if getattr(settings, "keep_alive_url", None) and not app.testing:
+        import os
+
+        if os.getenv("ENABLE_KEEP_ALIVE", "1") == "1":
+            from .keep_alive import start_keep_alive
+
+            start_keep_alive(settings.keep_alive_url)
 
     app.register_blueprint(bp)
     app.after_request(apply_security_headers)
